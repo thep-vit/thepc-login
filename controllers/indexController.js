@@ -2,8 +2,12 @@ const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
-exports.landing = (req, res) => {
+exports.loginPage = (req, res) => {
     res.status(200).render('index.ejs');
+}
+
+exports.signUpPage = (req, res) => {
+    res.status(200).render('signUp.ejs');
 }
 
 exports.userLogin = async (req, res) => {

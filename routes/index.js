@@ -1,8 +1,10 @@
 const express = require('express');
-const { landing, userLogin, userSignUp } = require('../controllers/indexController');
+const { loginPage, userLogin, userSignUp, signUpPage } = require('../controllers/indexController');
 const router = express.Router()
 
-router.get('/', landing);
+router.get('/', loginPage);
+
+router.get('/signup', signUpPage);
 
 router.post('/login', userLogin);
 
