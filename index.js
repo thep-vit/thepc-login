@@ -10,7 +10,8 @@ const mongoose = require("mongoose");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const indexRouter = require('./routes/index')
+const indexRouter = require('./routes/index');
+const passwordResetRouter = require('./routes/resetPassword');
 
 app.use(cors())
 app.use(express.json())
@@ -42,6 +43,7 @@ app.use(session({
 }))
 
 app.use('/', indexRouter)
+app.use('/reset', passwordResetRouter);
 
 app.listen(PORT, () => {
     console.log(`Server up and running on port: ${PORT}`)

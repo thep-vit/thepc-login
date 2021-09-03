@@ -18,12 +18,15 @@ exports.userLogin = async (req, res) => {
 
         const isMatch = await bcrypt.compare(password, foundUser.password);
         if(!isMatch){
+            console.log(foundUser.password, password);
+            let lp = await bcrypt.hash(password, 8);
+            console.log(lp);
             res.status(500).send({"msg": "Unable to login!"});
-        }
-        
-        const token = await jwt.sign({ _id:foundUser._id.toString(), isAdmin:foundUser.isAdmin.toString() }, process.env.SESSION_SECRET);
+        }else{
+            const token = await jwt.sign({ _id:foundUser._id.toString(), isAdmin:foundUser.isAdmin.toString() }, process.env.SESSION_SECRET);
 
-        res.status(200).send({ foundUser, token });        
+            res.status(200).send({ foundUser, token });        
+        }
     } catch (error) {
         console.log(error)
         res.status(400).send(error);
