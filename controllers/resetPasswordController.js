@@ -6,8 +6,8 @@ const mongoose = require("mongoose");
 var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'abhinavgorantla0613@gmail.com',
-      pass: 'kjvebhnpgijovmpt'
+      user: process.env.SENDER_EMAIL,
+      pass: process.env.SENDER_PASS
     }
 });
 
@@ -21,9 +21,13 @@ exports.requestLinkPage = (req, res) => {
 
 exports.passwordResetPage = async (req, res) => {
     try {
-        const foundUser = await User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: {$gt: Date.now()}})
 
-        if(!foundUser){
+        const decoded = jwt.verify(req.params.token, process.env.SESSION_SECRET);
+        console.log(decoded);
+        const foundUser = await User.findOne({ _id: decoded._id, resetPasswordToken: req.params.token})
+
+        if(!foundUser || Date.now() > decoded.date){
+            console.log(foundUser, Date.now() > decoded.date)
             return res.status(401).send({message: "Password token is invalid or expired!"});
         }
 
@@ -41,7 +45,7 @@ exports.passwordResetPage = async (req, res) => {
 exports.requestLink = async (req, res) => {
     try {
         const {email} = req.body;
-        const foundUser = await User.find({email});
+        const foundUser = await User.findOne({email});
 
         const foundUserId = mongoose.Types.ObjectId(foundUser._id);
 
@@ -54,13 +58,13 @@ exports.requestLink = async (req, res) => {
 
         await foundUser.save()
 
-        let link = "http://" + req.headers.host + "/reset/reset-password/" + foundUser.resetPasswordToken;
+        let link = "http://" + req.headers.host + "/reset/" + foundUser.resetPasswordToken;
 
         const mailOptions = {
             to: foundUser.email,
             from: process.env.SENDER_EMAIL,
             subject: "Password change request on thepc login",
-            text: `Hi ${resetTokenUser.name} \n 
+            text: `Hi ${foundUser.name} \n 
             Please click on the following link ${link} to reset your password. \n\n 
             If you did not request this, please ignore this email and your password will remain unchanged.\n`
         }
@@ -72,7 +76,7 @@ exports.requestLink = async (req, res) => {
             }else{
                 console.log("Email sent: " + info.response);
 
-                res.status(200).redirect('link-message');
+                res.status(200).redirect('reset/link-message');
             }
         })
     } catch (error) {
@@ -80,9 +84,10 @@ exports.requestLink = async (req, res) => {
     }
 }
 
-exports.resetPassword = async (Req, res) => {
-    try {
-        const foundUser = await User.findOne({ resetPasswordToken: req.params.token });
+exports.resetPassword = async (req, res) => {
+    // try {
+        const decoded = jwt.verify(req.params.token, process.env.SESSION_SECRET);
+        const foundUser = await User.findOne({ _id: decoded._id, resetPasswordToken: req.params.token})
         if(!foundUser){
             return res.status(401).send({message: "The password reset token has expired!"});
         }
@@ -98,15 +103,15 @@ exports.resetPassword = async (Req, res) => {
             from: process.env.FROM_EMAIL,
             subject: "Your password has been changed",
             text: `Hi ${foundUser.name} \n 
-            This is a confirmation that the password for your account ${foundUser.email} has just been changed.\n`
+            This is a confirmation that the password for your account with email ${foundUser.email} has just been changed on ${req.headers.host}.\n`
         };
 
         transporter.sendMail(mailOptions, (error, result) => {
-            if (error) return res.status(500).json({message: error.message});
-            res.redirect('/reset/reset-success');
+            
+            res.render('reset-success');
         });
-    } catch (error) {
-        res.status(500).send({message: error.message});
-    }
+    // } catch (error) {
+    //     res.status(500).send({message: error.message});
+    // }
 }
 

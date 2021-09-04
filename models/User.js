@@ -94,7 +94,7 @@ userSchema.methods.generateToken = async function () {
 }
 
 //Password reset token generation
-userSchema.methods.generatePasswordReset =  function(){
+userSchema.statics.generatePasswordReset =  function(){
     this.resetPasswordToken = jwt.sign({ _id:this._id.toString() }, process.env.SESSION_SECRET)
     this.resetPasswordExpires = Date.now() + 3600000;
   };
