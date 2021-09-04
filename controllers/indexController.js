@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const mongoose = require("mongoose");
 
 exports.loginPage = (req, res) => {
     res.status(200).render('index.ejs');
@@ -17,15 +18,22 @@ exports.userLogin = async (req, res) => {
         const foundUser = await User.findOne({email});
 
         const isMatch = await bcrypt.compare(password, foundUser.password);
-        if(!isMatch){
+        if(!isMatch & !foundUser.onboarded){
+            foundUser.password = password;
+            await foundUser.save();
+            
+            const token = await jwt.sign({ _id:foundUser._id.toString(), isAdmin:foundUser.isAdmin.toString() }, process.env.SESSION_SECRET);
+
+            res.status(200).send({ foundUser, token });
+        }else if(!isMatch & foundUser.onboarded){
             console.log(foundUser.password, password);
             let lp = await bcrypt.hash(password, 8);
             console.log(lp);
             res.status(500).send({"msg": "Unable to login!"});
-        }else{
+        }else if(isMatch){
             const token = await jwt.sign({ _id:foundUser._id.toString(), isAdmin:foundUser.isAdmin.toString() }, process.env.SESSION_SECRET);
 
-            res.status(200).send({ foundUser, token });        
+            res.status(200).send({ foundUser, token });
         }
     } catch (error) {
         console.log(error)
