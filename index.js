@@ -13,7 +13,11 @@ const PORT = process.env.PORT || 3000;
 const indexRouter = require('./routes/index');
 const passwordResetRouter = require('./routes/resetPassword');
 
-app.use(cors())
+var corsOptions = {
+    origin: 'http://localhost:3000',
+}
+
+app.use(cors(corsOptions))
 app.use(express.json())
 
 mongoose.connect(process.env.MONGO_URI, {
