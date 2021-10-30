@@ -8,16 +8,12 @@ const expressLayouts = require("express-ejs-layouts");
 const mongoose = require("mongoose");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8000;
 
 const indexRouter = require('./routes/index');
 const passwordResetRouter = require('./routes/resetPassword');
 
-var corsOptions = {
-    origin: 'http://localhost:3000',
-}
-
-app.use(cors(corsOptions))
+app.use(cors());
 app.use(express.json())
 
 mongoose.connect(process.env.MONGO_URI, {
@@ -48,6 +44,10 @@ app.use(session({
 
 app.use('/', indexRouter)
 app.use('/reset', passwordResetRouter);
+
+app.get('/test', (req, res) => {
+    res.send({message: 'CORS works!'});
+})
 
 app.listen(PORT, () => {
     console.log(`Server up and running on port: ${PORT}`)
