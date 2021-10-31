@@ -50,3 +50,13 @@ exports.userSignUp = async (req, res) => {
         res.status(400).send(error);
     }
 }
+
+exports.getAllUsers = async (req, res) => {
+    const foundUsers = await User.find().select('-password');
+
+    if(foundUsers){
+        res.status(200).send(foundUsers);
+    }else{
+        res.status(404).send({message: 'No users found!'});
+    }
+}
