@@ -55,7 +55,7 @@ exports.getAllUsers = async (req, res) => {
     const foundUsers = await User.find().select('-password');
 
     if(foundUsers){
-        res.status(200).send(foundUsers);
+        res.status(200).send({users: foundUsers});
     }else{
         res.status(404).send({message: 'No users found!'});
     }
