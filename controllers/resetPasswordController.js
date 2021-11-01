@@ -31,8 +31,7 @@ exports.passwordResetPage = async (req, res) => {
             return res.status(401).send({message: "Password token is invalid or expired!"});
         }
 
-        // res.render('reset-password');
-        res.status(200).send({message: 'Password reset token verified!'});
+        res.render('reset-password');
     } catch (error) {
         console.log(error);
         res.status(500).send(error);
@@ -77,7 +76,7 @@ exports.requestLink = async (req, res) => {
             }else{
                 console.log("Email sent: " + info.response);
 
-                res.status(200).send({message: 'Password resetlink sent!'});
+                res.status(200).redirect('reset/link-message');
             }
         })
     } catch (error) {
@@ -109,7 +108,7 @@ exports.resetPassword = async (req, res) => {
 
         transporter.sendMail(mailOptions, (error, result) => {
             
-            res.status(200).send({message: 'Password reset successfully!'});
+            res.render('reset-success');
         });
     // } catch (error) {
     //     res.status(500).send({message: error.message});
