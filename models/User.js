@@ -57,6 +57,10 @@ const userSchema = mongoose.Schema({
     },
     securityAnswer: {
         type: String
+    },
+    isDisabled: {
+        type: Boolean,
+        default: false
     }
 },{
     timestamps: true

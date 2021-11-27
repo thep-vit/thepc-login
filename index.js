@@ -12,6 +12,7 @@ const PORT = process.env.PORT || 8000;
 
 const indexRouter = require('./routes/index');
 const passwordResetRouter = require('./routes/resetPassword');
+const accessRouter = require('./routes/accessRoutes');
 
 app.use(cors());
 app.use(express.json())
@@ -44,6 +45,7 @@ app.use(session({
 
 app.use('/', indexRouter)
 app.use('/reset', passwordResetRouter);
+app.use('/accesscontrol', accessRouter);
 
 app.get('/test', (req, res) => {
     res.send({message: 'CORS works!'});

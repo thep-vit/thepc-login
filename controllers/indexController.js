@@ -24,7 +24,7 @@ exports.userLogin = async (req, res) => {
             console.log(lp);
             res.status(500).send({"msg": "Unable to login!"});
         }else if(isMatch){
-            const token = await jwt.sign({ _id:foundUser._id.toString(), isAdmin:foundUser.isAdmin.toString() }, process.env.SESSION_SECRET);
+            const token = await jwt.sign({ _id:foundUser._id.toString(), isAdmin:foundUser.isAdmin }, process.env.SESSION_SECRET);
 
             res.status(200).send({ foundUser, token });
         }
